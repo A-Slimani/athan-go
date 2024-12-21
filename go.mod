@@ -1,4 +1,4 @@
-module example/athan
+module athan
 
 go 1.23.4
 
