@@ -18,5 +18,17 @@ jobs:
               with:
                   go-version: "1.23"
 
-            - name: Build
-              run: go build 
+            - name: Build for Linux
+              run: GOOS=linux GOARCH=amd64 go build -o build/athan-linux
+
+            - name: Build for macOS
+              run: GOOS=darwin GOARCH=amd64 go build -o build/athan-macos
+
+            - name: Build for Windows
+              run: GOOS=windows GOARCH=amd64 go build -o build/athan-windows.exe
+
+            - name: Upload release assets
+              uses: actions/upload-artifact@v3
+              with:
+                  name: athan-binaries
+                  path: build/
