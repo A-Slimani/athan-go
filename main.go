@@ -36,13 +36,17 @@ func main() {
 	}
 
 	allFlag := flag.Bool("all", false, "Print all athan times")
-	// anotherFlag := flag.Bool("another", false, "Another flag")
+	forceFlag := flag.Bool("force", false, "force cache update")
 
 	flag.Parse()
 
 	if *allFlag {
 		allAthanTimes(athanCacheJson)
+	} else if *forceFlag {
+		cacheLocation(locationCacheJson)
+		cacheAthan(locationCacheJson, athanCacheJson)
+		getNextAthan(athanCacheJson)
 	} else {
-		nextAthanString(athanCacheJson)
+		getNextAthan(athanCacheJson)
 	}
 }
