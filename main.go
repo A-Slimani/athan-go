@@ -36,7 +36,7 @@ func main() {
 	}
 
 	allFlag := flag.Bool("all", false, "Print all athan times")
-	forceFlag := flag.Bool("force", false, "force cache update")
+	forceFlag := flag.Bool("force", false, "force cache update (use if cache is outdated or bugging)")
 
 	flag.Parse()
 
