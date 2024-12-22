@@ -1,5 +1,0 @@
-Args to pass through
-- athanTime (time.Time)
-- timeRemaining (time.Duration)
-- athanName (string)
-- 

@@ -13,7 +13,7 @@ func main() {
 
 	if os.IsNotExist(err) {
 		cacheLocation(locationCacheJson)
-	} else if locationCacheCheck.ModTime().AddDate(0, 0, 1).Before(time.Now()) {
+	} else if locationCacheCheck.ModTime().AddDate(0, 0, 1).Before(time.Now()) { // check this with unit tests
 		cacheLocation(locationCacheJson)
 	} else if err != nil {
 		fmt.Println("Error checking file: ", err)
@@ -29,7 +29,7 @@ func main() {
 			fmt.Println("Error checking file: ", err)
 		}
 	} else {
-		_, _, newMonthCheck := athanCacheCheck.ModTime().Date()
+		newMonthCheck := athanCacheCheck.ModTime().Day()
 		if newMonthCheck == 1 {
 			cacheAthan(locationCacheJson, athanCacheJson)
 		}
@@ -45,6 +45,7 @@ func main() {
 	} else if *forceFlag {
 		cacheLocation(locationCacheJson)
 		cacheAthan(locationCacheJson, athanCacheJson)
+		fmt.Println("Cache updated")
 		getNextAthan(athanCacheJson)
 	} else {
 		getNextAthan(athanCacheJson)
