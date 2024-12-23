@@ -32,6 +32,11 @@ type Response struct {
 	Data []Timings `json:"data"`
 }
 
+type Location struct {
+	City        string
+	CountryCode string
+}
+
 // HELPER FUNCTIONS
 func convertTime(athanTime string) string {
 	newTime, err := time.Parse("15:04", athanTime)
@@ -44,7 +49,7 @@ func convertTime(athanTime string) string {
 func buildAthanString(hours int, minutes int, athanName string) string {
 	parts := []string{}
 	if hours == 0 && minutes == 0 {
-		fmt.Printf("%s is now \n", athanName)
+		return fmt.Sprintf("%s is now \n", athanName)
 	}
 	if hours > 0 {
 		part := fmt.Sprintf("%d hour", hours)
@@ -60,8 +65,7 @@ func buildAthanString(hours int, minutes int, athanName string) string {
 		}
 		parts = append(parts, part)
 	}
-	result := fmt.Sprintf("%s in %s", athanName, strings.Join(parts, " and "))
-	return result
+	return fmt.Sprintf("%s in %s", athanName, strings.Join(parts, " and "))
 }
 
 // MAIN FUNCTIONS
@@ -80,8 +84,11 @@ func getAthanTimesForDay(athanCacheJson string, day int) AthanTimes {
 	return times[day-1]
 }
 
-func cacheAthan(locationCacheJson string, athanCacheJson string) {
+func CacheAthanTimes(locationCacheJson string, athanCacheJson string, locManual *Location) {
 
+	if locManual.City != "" {
+		fmt.Println("SKIBIDI")
+	}
 	// getting relevant data from location.json
 	locationJson, err := os.ReadFile(locationCacheJson)
 	if err != nil {
@@ -100,6 +107,7 @@ func cacheAthan(locationCacheJson string, athanCacheJson string) {
 
 	// getting athan times from api
 	const baseUrl = "http://api.aladhan.com/v1/calendar"
+	// change this to always use the city / country combo
 	params := url.Values{
 		"latitude":  {latitude},
 		"longitude": {longitude},
@@ -152,7 +160,7 @@ func cacheAthan(locationCacheJson string, athanCacheJson string) {
 	}
 }
 
-func getNextAthan(athanCacheJson string) {
+func GetNextAthan(athanCacheJson string) {
 	currentHours, currentMinutes := time.Now().Hour(), time.Now().Minute()
 	currentTimeCombined := currentHours*60 + currentMinutes
 	todaysTimes := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
@@ -197,7 +205,7 @@ func getNextAthan(athanCacheJson string) {
 	fmt.Println(returnStr)
 }
 
-func allAthanTimes(athanCacheJson string) {
+func AllAthanTimes(athanCacheJson string) {
 	values := reflect.ValueOf(getAthanTimesForDay(athanCacheJson, time.Now().Day()-1))
 
 	table := tablewriter.NewWriter(os.Stdout)
