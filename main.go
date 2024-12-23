@@ -12,6 +12,9 @@ func main() {
 	locationCacheJson := os.TempDir() + "/location.json"
 	locationCacheCheck, err := os.Stat(locationCacheJson)
 
+	athanCacheJson := os.TempDir() + "/athan.json"
+	athanCacheCheck, err := os.Stat(athanCacheJson)
+
 	allFlag := flag.Bool("all", false, "Print all athan times")
 	forceFlag := flag.Bool("force", false, "force cache update (use if cache is outdated or bugging)")
 	setLocationFlag := flag.Bool("set-location", false, "set location manually")
@@ -41,9 +44,6 @@ func main() {
 	} else if err != nil {
 		fmt.Println("Error checking file: ", err)
 	}
-
-	athanCacheJson := os.TempDir() + "/athan.json"
-	athanCacheCheck, err := os.Stat(athanCacheJson)
 
 	if err != nil {
 		if os.IsNotExist(err) {
