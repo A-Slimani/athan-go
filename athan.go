@@ -33,7 +33,9 @@ type Response struct {
 }
 
 // HELPER FUNCTIONS
+
 func convertTime(athanTime string) string {
+	athanTime = athanTime[:5]
 	newTime, err := time.Parse("15:04", athanTime)
 	if err != nil {
 		fmt.Println("Error parsing time: ", err)
@@ -64,6 +66,7 @@ func buildAthanString(hours int, minutes int, athanName string) string {
 }
 
 // MAIN FUNCTIONS
+
 func getAthanTimesForDay(athanCacheJson string, day int) AthanTimes {
 	athanJson, err := os.ReadFile(athanCacheJson)
 	if err != nil {
@@ -80,8 +83,6 @@ func getAthanTimesForDay(athanCacheJson string, day int) AthanTimes {
 }
 
 func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
-
-	// getting relevant data from location.json
 	locationJson, err := os.ReadFile(locationCacheJson)
 	if err != nil {
 		return fmt.Errorf("error reading file: %d", err)
@@ -93,9 +94,7 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 		return fmt.Errorf("error unmarshalling json: %d", err)
 	}
 
-	// getting athan times from api
-	const baseUrl = "https://api.aladhan.com/v1/calendar"
-	// change this to always use the city / country combo
+	const baseUrl = "https://api.aladhan.com/v1/calendarByCity"
 	params := url.Values{
 		"city":    {location.City},
 		"country": {location.Country},
@@ -122,13 +121,14 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 	}
 
 	var transformedData []AthanTimes
+	// find a better way to loop through all kvp
 	for i := range response.Data {
-		response.Data[i].Timing.Fajr = convertTime(response.Data[i].Timing.Fajr[:5])
-		response.Data[i].Timing.Sunrise = convertTime(response.Data[i].Timing.Sunrise[:5])
-		response.Data[i].Timing.Dhuhr = convertTime(response.Data[i].Timing.Dhuhr[:5])
-		response.Data[i].Timing.Asr = convertTime(response.Data[i].Timing.Asr[:5])
-		response.Data[i].Timing.Maghrib = convertTime(response.Data[i].Timing.Maghrib[:5])
-		response.Data[i].Timing.Isha = convertTime(response.Data[i].Timing.Isha[:5])
+		response.Data[i].Timing.Fajr = convertTime(response.Data[i].Timing.Fajr)
+		response.Data[i].Timing.Sunrise = convertTime(response.Data[i].Timing.Sunrise)
+		response.Data[i].Timing.Dhuhr = convertTime(response.Data[i].Timing.Dhuhr)
+		response.Data[i].Timing.Asr = convertTime(response.Data[i].Timing.Asr)
+		response.Data[i].Timing.Maghrib = convertTime(response.Data[i].Timing.Maghrib)
+		response.Data[i].Timing.Isha = convertTime(response.Data[i].Timing.Isha)
 		transformedData = append(transformedData, response.Data[i].Timing)
 	}
 

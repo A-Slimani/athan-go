@@ -20,5 +20,4 @@ A simple CLI script that fetches athan times based off your current location
 
 
 ## Testing Checklist 
-Cache Location
-- Location struct is correct
+Cache Athan

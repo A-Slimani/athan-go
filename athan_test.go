@@ -1,6 +1,8 @@
 package main
 
 import (
+	"encoding/json"
+	"os"
 	"testing"
 )
 
@@ -29,24 +31,48 @@ func Test_buildAthanString(t *testing.T) {
 }
 
 func Test_CacheAthanTimes(t *testing.T) {
+	locationCacheJson := os.TempDir() + "/location_test.json"
+	athanCacheJson := os.TempDir() + "/athan_test.json"
 
+	// setup to build location.json to run CacheAthanTimes
+	location := Location{
+		City:    "Sydney",
+		Country: "AU",
+	}
+	locationJson, _ := json.Marshal(location)
+	err := os.WriteFile(locationCacheJson, locationJson, 0644)
+	if err != nil {
+		t.Fatalf("Error writing location.json: %v", err)
+	}
+
+	err = CacheAthanTimes(locationCacheJson, athanCacheJson)
+	if err != nil {
+		t.Fatalf("Error caching athan times: %v", err)
+	}
+
+	if _, err := os.Stat(athanCacheJson); err != nil {
+		t.Fatalf("Error checking file: %v", err)
+	}
+
+	// check if the file athan file is correct
+
+	os.Remove(locationCacheJson)
+	os.Remove(athanCacheJson)
 }
 
 func Test_convertTime(t *testing.T) {
-	type args struct {
-		athanTime string
-	}
 	tests := []struct {
-		name string
-		args args
-		want string
+		name     string
+		input    string
+		expected string
 	}{
-		// TODO: Add test cases.
+		{"12 hour", "08:34 (AEST)", "08:34"},
+		{"24 hour", "20:34 (AEST)", "20:34"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := convertTime(tt.args.athanTime); got != tt.want {
-				t.Errorf("convertTime() = %v, want %v", got, tt.want)
+			if got := convertTime(tt.input); got != tt.expected {
+				t.Errorf("convertTime() = %v, want %v", got, tt.expected)
 			}
 		})
 	}
