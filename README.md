@@ -7,21 +7,18 @@ A simple CLI script that fetches athan times based off your current location
 
 ## Todo
 - [x] Force refresh of cached files
+- [ ] Change from raw json to -> SQLite implementation
 - [ ] Set home location if location is not found
-  - [ ] Manual passing of location
+  - [x] Manual passing of location
+- [ ] Update Athan function to switch between lat-long / city-country
 - [ ] Show the location of the Athan times in the table and string
 - [ ] Add styling with colours
 - [-] Write unit tests for code
   - [ ] Find out how to store a test file 
 - [ ] Refractor functions -> no need to pass through `athanCacheJson`
+- [ ] Store a list of invalid locations in another json file
 
 
-## Notes
-Flow
-  - If location file doesn't exsit
-    - ask user to pass location 
-    - default to getting location manually
-  
-  - If location automatic update daily
-  - If manual 
-    - Make user update -> provide a prompt for it
+## Testing Checklist 
+Cache Location
+- Location struct is correct

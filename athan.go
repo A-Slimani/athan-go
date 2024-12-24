@@ -32,11 +32,6 @@ type Response struct {
 	Data []Timings `json:"data"`
 }
 
-type Location struct {
-	City        string
-	CountryCode string
-}
-
 // HELPER FUNCTIONS
 func convertTime(athanTime string) string {
 	newTime, err := time.Parse("15:04", athanTime)
@@ -84,56 +79,46 @@ func getAthanTimesForDay(athanCacheJson string, day int) AthanTimes {
 	return times[day-1]
 }
 
-func CacheAthanTimes(locationCacheJson string, athanCacheJson string, locManual *Location) {
+func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 
-	if locManual.City != "" {
-		fmt.Println("SKIBIDI")
-	}
 	// getting relevant data from location.json
 	locationJson, err := os.ReadFile(locationCacheJson)
 	if err != nil {
-		fmt.Println("Error reading file: ", err)
+		return fmt.Errorf("error reading file: %d", err)
 	}
 
-	var data map[string]interface{}
-	err = json.Unmarshal(locationJson, &data)
+	var location Location
+	err = json.Unmarshal(locationJson, &location)
 	if err != nil {
-		fmt.Println("Error unmarshalling json: ", err)
+		return fmt.Errorf("error unmarshalling json: %d", err)
 	}
-
-	location := strings.Split(data["loc"].(string), ",")
-	latitude := location[0]
-	longitude := location[1]
 
 	// getting athan times from api
-	const baseUrl = "http://api.aladhan.com/v1/calendar"
+	const baseUrl = "https://api.aladhan.com/v1/calendar"
 	// change this to always use the city / country combo
 	params := url.Values{
-		"latitude":  {latitude},
-		"longitude": {longitude},
-		"method":    {"3"},
-		"month":     {strconv.Itoa(int(time.Now().Month()))},
-		"year":      {strconv.Itoa(time.Now().Year())},
+		"city":    {location.City},
+		"country": {location.Country},
+		"method":  {"3"},
+		"month":   {strconv.Itoa(int(time.Now().Month()))},
+		"year":    {strconv.Itoa(time.Now().Year())},
 	}
 
 	resp, err := http.Get(baseUrl + "?" + params.Encode())
 	if err != nil {
-		fmt.Println("Request error: ", err)
-		return
+		return fmt.Errorf("request error: %d", err)
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		fmt.Println("Error reading body: ", err)
-		return
+		return fmt.Errorf("error reading body: %d", err)
 	}
 
 	var response Response
 	err = json.Unmarshal(body, &response)
 	if err != nil {
-		fmt.Println("Error unmarshalling json: ", err)
-		return
+		return fmt.Errorf("error unmarshalling json: %d", err)
 	}
 
 	var transformedData []AthanTimes
@@ -149,15 +134,14 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string, locManual 
 
 	athanTimesJson, err := json.MarshalIndent(transformedData, "", "    ")
 	if err != nil {
-		fmt.Println("Error marshalling athan times: ", err)
-		return
+		return fmt.Errorf("error marshalling athan times: %d", err)
 	}
 
 	err = os.WriteFile(athanCacheJson, athanTimesJson, 0644)
 	if err != nil {
-		fmt.Println("Error writing to file: ", err)
-		return
+		return fmt.Errorf("error writing to file: %d", err)
 	}
+	return nil
 }
 
 func GetNextAthan(athanCacheJson string) {
