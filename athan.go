@@ -67,19 +67,25 @@ func buildAthanString(hours int, minutes int, athanName string) string {
 
 // MAIN FUNCTIONS
 
-func getAthanTimesForDay(athanCacheJson string, day int) AthanTimes {
+func getAthanTimesForDay(athanCacheJson string, day int) (*AthanTimes, error) {
+	d := day - 1
+	if d < 0 || d > 30 {
+		return nil, fmt.Errorf("invalid day outside of month range")
+	}
+
 	athanJson, err := os.ReadFile(athanCacheJson)
 	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
+		return nil, fmt.Errorf("error reading file: %w", err)
 	}
 
 	var times []AthanTimes
 	err = json.Unmarshal(athanJson, &times)
 	if err != nil {
-		fmt.Printf("Error unmarshalling json: %v\n", err)
+		return nil, fmt.Errorf("error unmarshalling json: %w", err)
 	}
 
-	return times[day-1]
+	currentTime := &times[d]
+	return currentTime, nil
 }
 
 func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
@@ -121,7 +127,7 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 	}
 
 	var transformedData []AthanTimes
-	// find a better way to loop through all kvp
+	// find a better way to loop through all key value pairs
 	for i := range response.Data {
 		response.Data[i].Timing.Fajr = convertTime(response.Data[i].Timing.Fajr)
 		response.Data[i].Timing.Sunrise = convertTime(response.Data[i].Timing.Sunrise)
@@ -144,17 +150,17 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 	return nil
 }
 
-func GetNextAthan(athanCacheJson string) {
-	currentHours, currentMinutes := time.Now().Hour(), time.Now().Minute()
+func GetNextAthan(athanCacheJson string, currentTime time.Time) (*string, error) {
+	currentHours, currentMinutes := currentTime.Hour(), currentTime.Minute()
 	currentTimeCombined := currentHours*60 + currentMinutes
-	todaysTimes := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
+	todaysTimes, _ := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
 
 	val := reflect.ValueOf(todaysTimes)
 	for i := 0; i < val.NumField(); i++ {
 		if val.Type().Field(i).Name != "Sunrise" {
 			athanTime, err := time.Parse("15:04", val.Field(i).Interface().(string))
 			if err != nil {
-				fmt.Println("Error parsing time: ", err)
+				return nil, fmt.Errorf("error parsing time: %w", err)
 			}
 			hours, minutes := athanTime.Hour(), athanTime.Minute()
 			athanCombined := hours*60 + minutes
@@ -165,15 +171,14 @@ func GetNextAthan(athanCacheJson string) {
 				athanName := val.Type().Field(i).Name
 
 				returnStr := buildAthanString(hours, minutes, athanName)
-				fmt.Println(returnStr)
-				break
+				return &returnStr, nil
 			}
 		}
 	}
-	tomorrowsTimes := getAthanTimesForDay(athanCacheJson, time.Now().Day())
+	tomorrowsTimes, _ := getAthanTimesForDay(athanCacheJson, time.Now().Day())
 	athanTime, err := time.Parse("15:04", tomorrowsTimes.Fajr)
 	if err != nil {
-		fmt.Println("Error parsing time: ", err)
+		return nil, fmt.Errorf("error parsing time: %w", err)
 	}
 
 	hours, minutes := athanTime.Hour(), athanTime.Minute()
@@ -186,11 +191,12 @@ func GetNextAthan(athanCacheJson string) {
 	athanName := "Fajr"
 
 	returnStr := buildAthanString(hours, minutes, athanName)
-	fmt.Println(returnStr)
+	return &returnStr, nil
 }
 
 func AllAthanTimes(athanCacheJson string) {
-	values := reflect.ValueOf(getAthanTimesForDay(athanCacheJson, time.Now().Day()-1))
+	times, _ := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
+	values := reflect.ValueOf(times)
 
 	table := tablewriter.NewWriter(os.Stdout)
 	table.SetHeader([]string{"Prayer", "Time"})

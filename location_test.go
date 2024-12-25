@@ -7,9 +7,8 @@ import (
 	"testing"
 )
 
-var locationCacheJson = os.TempDir() + "location_cache.json"
-
 func Test_CacheLocation(t *testing.T) {
+	locationCacheJson := "./testing_files/location_test.json"
 	tests := []struct {
 		name    string
 		input   string
@@ -43,13 +42,12 @@ func Test_CacheLocation(t *testing.T) {
 			if (err != nil) != tt.wantErr {
 				t.Errorf("CacheLocation() error = %v, wantErr %v", err, tt.wantErr)
 			}
-
-			// file check
 		})
 	}
 }
 
 func Test_writeLocationInfoToJson(t *testing.T) {
+	locationCacheJson := "./testing_files/location_test.json"
 	type args struct {
 		location Location
 	}
