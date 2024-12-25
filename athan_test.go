@@ -12,19 +12,20 @@ func Test_buildAthanString(t *testing.T) {
 		hours     int
 		minutes   int
 		athanName string
+		athanTime string
 		expected  string
 	}{
-		{3, 12, "Fajr", "Fajr in 3 hours and 12 minutes"},
-		{3, 1, "Fajr", "Fajr in 3 hours and 1 minute"},
-		{1, 2, "Fajr", "Fajr in 1 hour and 2 minutes"},
-		{1, 1, "Fajr", "Fajr in 1 hour and 1 minute"},
-		{1, 0, "Fajr", "Fajr in 1 hour"},
-		{0, 1, "Fajr", "Fajr in 1 minute"},
-		{0, 0, "Fajr", "Fajr is now \n"},
+		{3, 12, "Fajr", "3:55", "Fajr in 3 hours and 12 minutes at 3:55"},
+		{3, 1, "Fajr", "3:55", "Fajr in 3 hours and 1 minute at 3:55"},
+		{1, 2, "Fajr", "3:55", "Fajr in 1 hour and 2 minutes at 3:55"},
+		{1, 1, "Fajr", "3:55", "Fajr in 1 hour and 1 minute at 3:55"},
+		{1, 0, "Fajr", "3:55", "Fajr in 1 hour at 3:55"},
+		{0, 1, "Fajr", "3:55", "Fajr in 1 minute at 3:55"},
+		{0, 0, "Fajr", "3:55", "Fajr is now at 3:55"},
 	}
 
 	for _, tc := range testCases {
-		result := buildAthanString(tc.hours, tc.minutes, tc.athanName)
+		result := buildAthanString(tc.hours, tc.minutes, tc.athanName, tc.athanTime)
 		if result != tc.expected {
 			t.Errorf("Expected: %s, returned: %s ", tc.expected, result)
 		}
@@ -141,6 +142,31 @@ func Test_GetNextAthan(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if athanString, err := GetNextAthan(tt.athanTestCache, tt.mockCurrentTime); (err != nil) != tt.wantErr && tt.expected != *athanString {
 				t.Errorf("GetNextAthan() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+// make this test more robust testing the table string
+func Test_AllAthanTimes(t *testing.T) {
+	testAthanCache := "./testing_files/athan_test.json"
+	testLocationCache := "./testing_files/location_test.json"
+
+	tests := []struct {
+		name       string
+		day        int
+		wantErr    bool
+		athanTimes AthanTimes
+	}{
+		{"Valid lowest bound", 1, false, AthanTimes{"03:56", "05:37", "12:44", "16:29", "19:51", "21:26"}},
+		{"Valid highest bound", 31, false, AthanTimes{"04:03", "05:47", "12:58", "16:43", "20:09", "21:46"}},
+		{"Invalid day", 0, true, AthanTimes{}},
+		{"Invalid day", 32, true, AthanTimes{}},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := AllAthanTimes(testAthanCache, testLocationCache, tt.day); (err != nil) != tt.wantErr {
+				t.Errorf("AllAthanTimes() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
 	}

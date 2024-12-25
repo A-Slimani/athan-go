@@ -47,7 +47,8 @@ func main() {
 	switch {
 	case *setLocationFlag:
 	case *allFlag:
-		AllAthanTimes(athanCacheJson)
+		today := currentTime.Day()
+		AllAthanTimes(athanCacheJson, locationCacheJson, today)
 	case *forceFlag:
 		reader := bufio.NewReader(os.Stdin)
 		if err := CacheLocation(reader, locationCacheJson); err != nil {
@@ -66,6 +67,7 @@ func main() {
 		nextAthan, _ := GetNextAthan(athanCacheJson, currentTime)
 		if err != nil {
 			fmt.Println("Error getting next athan: ", err)
+			return
 		}
 		fmt.Println(*nextAthan)
 	}
