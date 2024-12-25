@@ -153,9 +153,12 @@ func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
 func GetNextAthan(athanCacheJson string, currentTime time.Time) (*string, error) {
 	currentHours, currentMinutes := currentTime.Hour(), currentTime.Minute()
 	currentTimeCombined := currentHours*60 + currentMinutes
-	todaysTimes, _ := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
+	todaysTimes, err := getAthanTimesForDay(athanCacheJson, time.Now().Day()-1)
+	if err != nil || todaysTimes == nil {
+		return nil, fmt.Errorf("error getting athan times: %w", err)
+	}
 
-	val := reflect.ValueOf(todaysTimes)
+	val := reflect.ValueOf(*todaysTimes)
 	for i := 0; i < val.NumField(); i++ {
 		if val.Type().Field(i).Name != "Sunrise" {
 			athanTime, err := time.Parse("15:04", val.Field(i).Interface().(string))
