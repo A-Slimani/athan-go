@@ -18,6 +18,21 @@ type Location struct {
 
 // HELPER FUNCTIONS
 
+func readLocation(locationCacheJson string) (Location, error) {
+	locationJson, err := os.ReadFile(locationCacheJson)
+	if err != nil {
+		return Location{}, fmt.Errorf("error reading file: %v", err)
+	}
+
+	var location Location
+	err = json.Unmarshal(locationJson, &location)
+	if err != nil {
+		return Location{}, fmt.Errorf("error unmarshalling json: %v", err)
+	}
+
+	return location, nil
+}
+
 func writeLocationInfoToJson(location Location, locationCacheJson string) error {
 	city := location.City
 	country := location.Country

@@ -56,7 +56,10 @@ func main() {
 			return
 		}
 		CacheAthanTimes(locationCacheJson, athanCacheJson)
-		fmt.Println("Cache updated")
+
+		location, _ := readLocation(locationCacheJson)
+
+		fmt.Printf("Cache updated, getting athan times from: %s, %s\n", location.City, location.Country)
 		nextAthan, err := GetNextAthan(athanCacheJson, currentTime)
 		if err != nil {
 			fmt.Println("Error getting next athan: ", err)

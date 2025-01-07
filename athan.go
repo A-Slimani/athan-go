@@ -89,16 +89,7 @@ func getAthanTimesForDay(athanCacheJson string, day int) (*AthanTimes, error) {
 }
 
 func CacheAthanTimes(locationCacheJson string, athanCacheJson string) error {
-	locationJson, err := os.ReadFile(locationCacheJson)
-	if err != nil {
-		return fmt.Errorf("error reading file: %d", err)
-	}
-
-	var location Location
-	err = json.Unmarshal(locationJson, &location)
-	if err != nil {
-		return fmt.Errorf("error unmarshalling json: %d", err)
-	}
+	location, _ := readLocation(locationCacheJson)
 
 	const baseUrl = "https://api.aladhan.com/v1/calendarByCity"
 	params := url.Values{
