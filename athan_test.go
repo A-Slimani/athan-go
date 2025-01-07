@@ -15,12 +15,12 @@ func Test_buildAthanString(t *testing.T) {
 		athanTime string
 		expected  string
 	}{
-		{3, 12, "Fajr", "3:55", "Fajr in 3 hours and 12 minutes at 3:55"},
-		{3, 1, "Fajr", "3:55", "Fajr in 3 hours and 1 minute at 3:55"},
-		{1, 2, "Fajr", "3:55", "Fajr in 1 hour and 2 minutes at 3:55"},
-		{1, 1, "Fajr", "3:55", "Fajr in 1 hour and 1 minute at 3:55"},
-		{1, 0, "Fajr", "3:55", "Fajr in 1 hour at 3:55"},
-		{0, 1, "Fajr", "3:55", "Fajr in 1 minute at 3:55"},
+		{3, 12, "Fajr", "3:55", "Next prayer Fajr in 3 hours and 12 minutes at 3:55"},
+		{3, 1, "Fajr", "3:55", "Next prayer Fajr in 3 hours and 1 minute at 3:55"},
+		{1, 2, "Fajr", "3:55", "Next prayer Fajr in 1 hour and 2 minutes at 3:55"},
+		{1, 1, "Fajr", "3:55", "Next prayer Fajr in 1 hour and 1 minute at 3:55"},
+		{1, 0, "Fajr", "3:55", "Next prayer Fajr in 1 hour at 3:55"},
+		{0, 1, "Fajr", "3:55", "Next prayer Fajr in 1 minute at 3:55"},
 		{0, 0, "Fajr", "3:55", "Fajr is now at 3:55"},
 	}
 
@@ -60,7 +60,7 @@ func Test_CacheAthanTimes(t *testing.T) {
 	os.Remove(athanCacheJson)
 }
 
-// TODO: testing the amount of times(object) in the jsonTODO: Do this test later
+// TODO: testing the amount of times(object) in the json TODO: Do this test later
 func Test_getAthanTimesForDay(t *testing.T) {
 	athanCacheJson := "./testing_files/athan_test.json" // TODO: craft an example file to test with
 	tests := []struct {
@@ -127,14 +127,14 @@ func Test_GetNextAthan(t *testing.T) {
 			"Valid",
 			testAthanCache,
 			time.Date(2021, 10, 1, 5, 0, 0, 0, time.UTC),
-			"Fajr in 3 hours and 56 minutes",
+			"Next Prayer Fajr in 3 hours and 56 minutes",
 			false,
 		},
 		{
 			"Loop to next day",
 			testAthanCache,
 			time.Date(2021, 10, 1, 5, 23, 0, 0, time.UTC),
-			"Fajr in 4 hours and 55 minutes",
+			"Next Prayer Fajr in 4 hours and 55 minutes",
 			false,
 		},
 	}

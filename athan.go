@@ -62,7 +62,7 @@ func buildAthanString(hours int, minutes int, athanName string, athanTime string
 		}
 		parts = append(parts, part)
 	}
-	return fmt.Sprintf("%s in %s", athanName, strings.Join(parts, " and ")) + " at " + athanTime
+	return "Next prayer " + fmt.Sprintf("%s in %s", athanName, strings.Join(parts, " and ")) + " at " + athanTime
 }
 
 // MAIN FUNCTIONS
