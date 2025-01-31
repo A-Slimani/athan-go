@@ -68,7 +68,7 @@ func buildAthanString(hours int, minutes int, athanName string, athanTime string
 // MAIN FUNCTIONS
 
 func getAthanTimesForDay(athanCacheJson string, day int) (*AthanTimes, error) {
-	d := day - 1
+	d := day
 	if d < 0 || d > 30 {
 		return nil, fmt.Errorf("invalid day outside of month range")
 	}

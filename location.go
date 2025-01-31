@@ -40,11 +40,11 @@ func writeLocationInfoToJson(location Location, locationCacheJson string) error 
 	pattern := "^[a-zA-Z]+$"
 	match, err := regexp.MatchString(pattern, city)
 	if !match || err != nil {
-		return fmt.Errorf("invalid city input")
+		return fmt.Errorf("invalid city input: %v, %v", city, country)
 	}
 	match, err = regexp.MatchString(pattern, country)
 	if !match || err != nil {
-		return fmt.Errorf("invalid city input")
+		return fmt.Errorf("invalid city input: %v, %v", city, country)
 	}
 
 	locationJson, err := json.Marshal(location)
