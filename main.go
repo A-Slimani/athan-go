@@ -5,11 +5,20 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"runtime"
 	"time"
 )
 
 func main() {
-	locationCacheJson := os.TempDir() + "/location.json"
+
+	var locationCacheJson string
+
+	switch system := runtime.GOOS; system {
+	case "windows":
+		locationCacheJson = os.TempDir() + "\\location.json"
+	default:
+		locationCacheJson = os.TempDir() + "/location.json"
+	}
 	_, err := os.Stat(locationCacheJson)
 	if os.IsNotExist(err) {
 		reader := bufio.NewReader(os.Stdin)
